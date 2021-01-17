@@ -68,6 +68,7 @@ final class FluxArray<T> extends Flux<T> implements Fuseable, SourceProducer<T> 
 		return null;
 	}
 
+	// TODO: 2021/1/17 代码和IterableSubscription类似，由迭代器方式改为循环数组
 	static final class ArraySubscription<T>
 			implements InnerProducer<T>, SynchronousSubscription<T> {
 

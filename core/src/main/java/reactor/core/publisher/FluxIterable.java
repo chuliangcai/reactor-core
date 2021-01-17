@@ -174,9 +174,13 @@ final class FluxIterable<T> extends Flux<T> implements Fuseable, SourceProducer<
 		final boolean               knownToBeFinite;
 		final Runnable              onClose;
 
+		// TODO: 2021/1/16 声明volatile可以支持并发操作
 		volatile boolean cancelled;
 
+		// TODO: 2021/1/17 已经请求的个数
 		volatile long requested;
+
+		// TODO: 2021/1/17 requested原子增长
 		@SuppressWarnings("rawtypes")
 		static final AtomicLongFieldUpdater<IterableSubscription> REQUESTED =
 				AtomicLongFieldUpdater.newUpdater(IterableSubscription.class,
@@ -217,6 +221,7 @@ final class FluxIterable<T> extends Flux<T> implements Fuseable, SourceProducer<
 			this(actual, iterator, knownToBeFinite, null);
 		}
 
+		// TODO: 2021/1/16 请求publisher发布事件
 		@Override
 		public void request(long n) {
 			if (Operators.validate(n)) {
@@ -242,6 +247,7 @@ final class FluxIterable<T> extends Flux<T> implements Fuseable, SourceProducer<
 			}
 		}
 
+		// TODO: 2021/1/16 发布从0到n的元素
 		void slowPath(long n) {
 			final Iterator<? extends T> a = iterator;
 			final Subscriber<? super T> s = actual;
@@ -309,6 +315,7 @@ final class FluxIterable<T> extends Flux<T> implements Fuseable, SourceProducer<
 			}
 		}
 
+		// TODO: 2021/1/16 迭代器方式发布事件
 		void fastPath() {
 			final Iterator<? extends T> a = iterator;
 			final Subscriber<? super T> s = actual;
