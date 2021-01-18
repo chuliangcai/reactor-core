@@ -79,6 +79,7 @@ public final class Queues {
 	 * An allocation friendly default of available slots in a given container, e.g. slow publishers and or fast/few
 	 * subscribers
 	 */
+	// TODO: 2021/1/17 默认缓冲区大小 32
 	public static final int XS_BUFFER_SIZE    = Math.max(8,
 			Integer.parseInt(System.getProperty("reactor.bufferSize.x", "32")));
 	/**

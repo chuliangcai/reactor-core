@@ -27,6 +27,7 @@ import reactor.util.annotation.Nullable;
 /**
  * A micro API for stream fusion, in particular marks producers that support a {@link QueueSubscription}.
  */
+// TODO: 2021/1/17 表示是否可融合
 public interface Fuseable {
 
 	/** Indicates the QueueSubscription can't support the requested mode. */
@@ -85,6 +86,7 @@ public interface Fuseable {
 	 *
 	 * @param <T> the value type emitted
 	 */
+	// TODO: 2021/1/17 基于队列的订阅接口
 	interface QueueSubscription<T> extends Queue<T>, Subscription {
 		
 		String NOT_SUPPORTED_MESSAGE = "Although QueueSubscription extends Queue it is purely internal" +
