@@ -79,6 +79,7 @@ public final class Queues {
 	 * An allocation friendly default of available slots in a given container, e.g. slow publishers and or fast/few
 	 * subscribers
 	 */
+	// TODO: 2021/1/17 默认缓冲区大小 32
 	public static final int XS_BUFFER_SIZE    = Math.max(8,
 			Integer.parseInt(System.getProperty("reactor.bufferSize.x", "32")));
 	/**
@@ -229,12 +230,12 @@ public final class Queues {
 	}
 
 	static final class OneQueue<T> extends AtomicReference<T> implements Queue<T> {
-        @Override
+		@Override
 		public boolean add(T t) {
 
-		    while (!offer(t));
+			while (!offer(t));
 
-		    return true;
+			return true;
 		}
 
 		@Override
@@ -275,7 +276,7 @@ public final class Queues {
 		@Override
 		public boolean offer(T t) {
 			if (get() != null) {
-			    return false;
+				return false;
 			}
 			lazySet(t);
 			return true;
@@ -292,7 +293,7 @@ public final class Queues {
 		public T poll() {
 			T v = get();
 			if (v != null) {
-			    lazySet(null);
+				lazySet(null);
 			}
 			return v;
 		}
@@ -476,14 +477,14 @@ public final class Queues {
 		}
 	}
 
-    @SuppressWarnings("rawtypes")
-    static final Supplier ZERO_SUPPLIER  = ZeroQueue::new;
-    @SuppressWarnings("rawtypes")
-    static final Supplier ONE_SUPPLIER   = OneQueue::new;
 	@SuppressWarnings("rawtypes")
-    static final Supplier XS_SUPPLIER    = () -> new SpscArrayQueue<>(XS_BUFFER_SIZE);
+	static final Supplier ZERO_SUPPLIER  = ZeroQueue::new;
 	@SuppressWarnings("rawtypes")
-    static final Supplier SMALL_SUPPLIER = () -> new SpscArrayQueue<>(SMALL_BUFFER_SIZE);
+	static final Supplier ONE_SUPPLIER   = OneQueue::new;
+	@SuppressWarnings("rawtypes")
+	static final Supplier XS_SUPPLIER    = () -> new SpscArrayQueue<>(XS_BUFFER_SIZE);
+	@SuppressWarnings("rawtypes")
+	static final Supplier SMALL_SUPPLIER = () -> new SpscArrayQueue<>(SMALL_BUFFER_SIZE);
 	@SuppressWarnings("rawtypes")
 	static final Supplier SMALL_UNBOUNDED =
 			() -> new SpscLinkedArrayQueue<>(SMALL_BUFFER_SIZE);

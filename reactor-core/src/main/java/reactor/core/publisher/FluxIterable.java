@@ -93,7 +93,7 @@ final class FluxIterable<T> extends Flux<T> implements Fuseable, SourceProducer<
 			if (iterable instanceof Tuple2) return ((Tuple2) iterable).size();
 		}
 		if (key == Attr.RUN_STYLE) {
-		    return Attr.RunStyle.SYNC;
+			return Attr.RunStyle.SYNC;
 		}
 		return null;
 	}
@@ -119,7 +119,7 @@ final class FluxIterable<T> extends Flux<T> implements Fuseable, SourceProducer<
 	 */
 	@SuppressWarnings("unchecked")
 	static <T> void subscribe(CoreSubscriber<? super T> s, Iterator<? extends T> it,
-			boolean knownToBeFinite, @Nullable Runnable onClose) {
+							  boolean knownToBeFinite, @Nullable Runnable onClose) {
 		//noinspection ConstantConditions
 		if (it == null) {
 			Operators.error(s, new NullPointerException("The iterator is null"));
@@ -174,9 +174,13 @@ final class FluxIterable<T> extends Flux<T> implements Fuseable, SourceProducer<
 		final boolean               knownToBeFinite;
 		final Runnable              onClose;
 
+		// TODO: 2021/1/16 声明volatile可以支持并发操作
 		volatile boolean cancelled;
 
+		// TODO: 2021/1/17 已经请求的个数
 		volatile long requested;
+
+		// TODO: 2021/1/17 requested原子增长
 		@SuppressWarnings("rawtypes")
 		static final AtomicLongFieldUpdater<IterableSubscription> REQUESTED =
 				AtomicLongFieldUpdater.newUpdater(IterableSubscription.class,
@@ -205,7 +209,7 @@ final class FluxIterable<T> extends Flux<T> implements Fuseable, SourceProducer<
 		T current;
 
 		IterableSubscription(CoreSubscriber<? super T> actual,
-				Iterator<? extends T> iterator, boolean knownToBeFinite, @Nullable Runnable onClose) {
+							 Iterator<? extends T> iterator, boolean knownToBeFinite, @Nullable Runnable onClose) {
 			this.actual = actual;
 			this.iterator = iterator;
 			this.knownToBeFinite = knownToBeFinite;
@@ -213,10 +217,11 @@ final class FluxIterable<T> extends Flux<T> implements Fuseable, SourceProducer<
 		}
 
 		IterableSubscription(CoreSubscriber<? super T> actual,
-				Iterator<? extends T> iterator, boolean knownToBeFinite) {
+							 Iterator<? extends T> iterator, boolean knownToBeFinite) {
 			this(actual, iterator, knownToBeFinite, null);
 		}
 
+		// TODO: 2021/1/16 请求publisher发布事件
 		@Override
 		public void request(long n) {
 			if (Operators.validate(n)) {
@@ -242,6 +247,7 @@ final class FluxIterable<T> extends Flux<T> implements Fuseable, SourceProducer<
 			}
 		}
 
+		// TODO: 2021/1/16 发布从0到n的元素
 		void slowPath(long n) {
 			final Iterator<? extends T> a = iterator;
 			final Subscriber<? super T> s = actual;
@@ -309,6 +315,7 @@ final class FluxIterable<T> extends Flux<T> implements Fuseable, SourceProducer<
 			}
 		}
 
+		// TODO: 2021/1/16 迭代器方式发布事件
 		void fastPath() {
 			final Iterator<? extends T> a = iterator;
 			final Subscriber<? super T> s = actual;
@@ -482,7 +489,7 @@ final class FluxIterable<T> extends Flux<T> implements Fuseable, SourceProducer<
 		T current;
 
 		IterableSubscriptionConditional(ConditionalSubscriber<? super T> actual,
-				Iterator<? extends T> iterator, boolean knownToBeFinite, @Nullable Runnable onClose) {
+										Iterator<? extends T> iterator, boolean knownToBeFinite, @Nullable Runnable onClose) {
 			this.actual = actual;
 			this.iterator = iterator;
 			this.knownToBeFinite = knownToBeFinite;
@@ -490,7 +497,7 @@ final class FluxIterable<T> extends Flux<T> implements Fuseable, SourceProducer<
 		}
 
 		IterableSubscriptionConditional(ConditionalSubscriber<? super T> actual,
-				Iterator<? extends T> iterator, boolean knownToBeFinite) {
+										Iterator<? extends T> iterator, boolean knownToBeFinite) {
 			this(actual, iterator, knownToBeFinite, null);
 		}
 

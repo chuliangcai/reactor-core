@@ -142,30 +142,38 @@ public interface FluxSink<T> {
 	/**
 	 * Enumeration for backpressure handling.
 	 */
+	// TODO: 2021/1/20 背压是指在异步场景中，被观察者发送事件速度远快于观察者的处理速度的情况下，
+	//  一种告诉上游的被观察者降低发送速度的策略。简而言之，背压是流速控制的一种策略。
+	// TODO: 2021/1/20 背压策略
 	enum OverflowStrategy {
 		/**
 		 * Completely ignore downstream backpressure requests.
 		 * <p>
 		 * This may yield {@link IllegalStateException} when queues get full downstream.
 		 */
+		// TODO: 2021/1/20 不管背压
 		IGNORE,
 		/**
 		 * Signal an {@link IllegalStateException} when the downstream can't keep up
 		 */
+		// TODO: 2021/1/20 当下游不能继续的时候发送一个错误信号
 		ERROR,
 		/**
 		 * Drop the incoming signal if the downstream is not ready to receive it.
 		 */
+		// TODO: 2021/1/20 当下游不能接受新的事件的时候丢弃掉发布的事件
 		DROP,
 		/**
 		 * Downstream will get only the latest signals from upstream.
 		 */
+		// TODO: 2021/1/20 下游永远获取最新的那个信号
 		LATEST,
 		/**
 		 * Buffer all signals if the downstream can't keep up.
 		 * <p>
 		 * Warning! This does unbounded buffering and may lead to {@link OutOfMemoryError}.
 		 */
+		// TODO: 2021/1/20 如果下游不能继续的话，将事件缓冲起来,使用的是一个无界队列，需要额外注意OOM问题
 		BUFFER
 	}
 }

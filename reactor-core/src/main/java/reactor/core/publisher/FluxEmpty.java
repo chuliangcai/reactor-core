@@ -30,6 +30,7 @@ import reactor.util.annotation.Nullable;
 final class FluxEmpty extends Flux<Object>
 		implements Fuseable.ScalarCallable<Object>, SourceProducer<Object> {
 
+	// TODO: 2021/1/17 每次都是同一个对象
 	private static final Flux<Object> INSTANCE = new FluxEmpty();
 
 	private FluxEmpty() {
@@ -38,6 +39,7 @@ final class FluxEmpty extends Flux<Object>
 
 	@Override
 	public void subscribe(CoreSubscriber<? super Object> actual) {
+		// TODO: 2021/1/17 空的flux,订阅即完成
 		Operators.complete(actual);
 	}
 

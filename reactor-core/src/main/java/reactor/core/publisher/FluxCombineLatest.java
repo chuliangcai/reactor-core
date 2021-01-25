@@ -45,12 +45,15 @@ import reactor.util.context.Context;
  */
 final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceProducer<R> {
 
+	// TODO: 2021/1/17 所有的publisher
 	final Publisher<? extends T>[] array;
 
 	final Iterable<? extends Publisher<? extends T>> iterable;
 
+	// TODO: 2021/1/17 连接函数
 	final Function<Object[], R> combiner;
 
+	// TODO: 2021/1/17 缓冲队列
 	final Supplier<? extends Queue<SourceAndArray>> queueSupplier;
 
 	final int prefetch;
@@ -168,11 +171,13 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 
 		Queue<SourceAndArray> queue = queueSupplier.get();
 
+		// TODO: 2021/1/17 协调器(QueueSubscription)
 		CombineLatestCoordinator<T, R> coordinator =
 				new CombineLatestCoordinator<>(actual, combiner, n, queue, prefetch);
 
 		actual.onSubscribe(coordinator);
 
+		// TODO: 2021/1/17
 		coordinator.subscribe(a, n);
 	}
 
@@ -183,13 +188,18 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 		return null;
 	}
 
+	// TODO: 2021/1/17 基于队列的订阅
 	static final class CombineLatestCoordinator<T, R>
 			implements QueueSubscription<R>, InnerProducer<R> {
 
+		// TODO: 2021/1/17 连接函数
 		final Function<Object[], R>     combiner;
+		// TODO: 2021/1/17 内部订阅器数组
 		final CombineLatestInner<T>[]   subscribers;
 		final Queue<SourceAndArray>     queue;
+		// TODO: 2021/1/18 保留每个publisher的最后一个元素
 		final Object[]                  latest;
+		// TODO: 2021/1/18 实际的订阅者
 		final CoreSubscriber<? super R> actual;
 
 		boolean outputFused;
@@ -207,12 +217,14 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 				AtomicLongFieldUpdater.newUpdater(CombineLatestCoordinator.class,
 						"requested");
 
+		// TODO: 2021/1/17 标记作用 0或者1
 		volatile int wip;
 		@SuppressWarnings("rawtypes")
 		static final AtomicIntegerFieldUpdater<CombineLatestCoordinator> WIP =
 				AtomicIntegerFieldUpdater.newUpdater(CombineLatestCoordinator.class,
 						"wip");
 
+		// TODO: 2021/1/17 标记是否做完
 		volatile boolean done;
 
 		volatile Throwable error;
@@ -224,6 +236,7 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 						Throwable.class,
 						"error");
 
+		// TODO: 2021/1/17 构造一个协调器
 		CombineLatestCoordinator(CoreSubscriber<? super R> actual,
 				Function<Object[], R> combiner,
 				int n,
@@ -244,10 +257,11 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 		public final CoreSubscriber<? super R> actual() {
 			return actual;
 		}
-		
+
 		@Override
 		public void request(long n) {
 			if (Operators.validate(n)) {
+				// TODO: 2021/1/17 设置请求个数
 				Operators.addCap(REQUESTED, this, n);
 				drain();
 			}
@@ -289,14 +303,17 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 				if (done || cancelled) {
 					return;
 				}
+				// TODO: 2021/1/17 新构造的订阅者订阅原始的发布者
 				sources[i].subscribe(a[i]);
 			}
 		}
 
+		// TODO: 2021/1/18 真正执行onNext方法
 		void innerValue(int index, T value) {
 
 			boolean replenishInsteadOfDrain;
 
+			// TODO: 2021/1/18 该方法保证了除了最后一个publisher其他的publisher只有最后一个元素会被封装到SourceAndArray进入队列
 			synchronized (this) {
 				Object[] os = latest;
 
@@ -313,6 +330,7 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 					SourceAndArray sa =
 							new SourceAndArray(subscribers[index], os.clone());
 
+					// TODO: 2021/1/17 入队
 					if (!queue.offer(sa)) {
 						innerError(Operators.onOperatorError(this, Exceptions.failWithOverflow(Exceptions.BACKPRESSURE_ERROR_QUEUE_FULL), actual.currentContext()));
 						return;
@@ -477,11 +495,12 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 			if (WIP.getAndIncrement(this) != 0) {
 				return;
 			}
-
+			// TODO: 2021/1/17 outputFused默认为false
 			if (outputFused) {
 				drainOutput();
 			}
 			else {
+				// TODO: 2021/1/17 异步的发布事件
 				drainAsync();
 			}
 		}
@@ -560,6 +579,7 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 		}
 	}
 
+	// TODO: 2021/1/17 combineLatest订阅者
 	static final class CombineLatestInner<T>
 			implements InnerConsumer<T> {
 
@@ -588,7 +608,7 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 			this.prefetch = prefetch;
 			this.limit = Operators.unboundedOrLimit(prefetch);
 		}
-		
+
 		@Override
 		public Context currentContext() {
 			return parent.actual.currentContext();
@@ -597,6 +617,7 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 		@Override
 		public void onSubscribe(Subscription s) {
 			if (Operators.setOnce(S, this, s)) {
+				// TODO: 2021/1/17 prefetch默认是32
 				s.request(Operators.unboundedOrPrefetch(prefetch));
 			}
 		}

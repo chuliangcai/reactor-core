@@ -116,6 +116,7 @@ final class LambdaSubscriber<T>
 				}
 			}
 			else {
+				// TODO: 2021/1/16 请求publisher发布事件
 				s.request(Long.MAX_VALUE);
 			}
 		}
