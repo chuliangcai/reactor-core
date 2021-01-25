@@ -194,10 +194,12 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 
 		// TODO: 2021/1/17 连接函数
 		final Function<Object[], R>     combiner;
-		// TODO: 2021/1/17 订阅器数组
+		// TODO: 2021/1/17 内部订阅器数组
 		final CombineLatestInner<T>[]   subscribers;
 		final Queue<SourceAndArray>     queue;
+		// TODO: 2021/1/18 保留每个publisher的最后一个元素
 		final Object[]                  latest;
+		// TODO: 2021/1/18 实际的订阅者
 		final CoreSubscriber<? super R> actual;
 
 		boolean outputFused;
@@ -215,7 +217,7 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 				AtomicLongFieldUpdater.newUpdater(CombineLatestCoordinator.class,
 						"requested");
 
-		// TODO: 2021/1/17
+		// TODO: 2021/1/17 标记作用 0或者1
 		volatile int wip;
 		@SuppressWarnings("rawtypes")
 		static final AtomicIntegerFieldUpdater<CombineLatestCoordinator> WIP =
@@ -255,7 +257,7 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 		public final CoreSubscriber<? super R> actual() {
 			return actual;
 		}
-		
+
 		@Override
 		public void request(long n) {
 			if (Operators.validate(n)) {
@@ -311,6 +313,7 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 
 			boolean replenishInsteadOfDrain;
 
+			// TODO: 2021/1/18 该方法保证了除了最后一个publisher其他的publisher只有最后一个元素会被封装到SourceAndArray进入队列
 			synchronized (this) {
 				Object[] os = latest;
 
@@ -327,7 +330,7 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 					SourceAndArray sa =
 							new SourceAndArray(subscribers[index], os.clone());
 
-					// TODO: 2021/1/17 入队 
+					// TODO: 2021/1/17 入队
 					if (!queue.offer(sa)) {
 						innerError(Operators.onOperatorError(this, Exceptions.failWithOverflow(Exceptions.BACKPRESSURE_ERROR_QUEUE_FULL), actual.currentContext()));
 						return;
@@ -492,7 +495,7 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 			if (WIP.getAndIncrement(this) != 0) {
 				return;
 			}
-			// TODO: 2021/1/17 outputFused默认为false 
+			// TODO: 2021/1/17 outputFused默认为false
 			if (outputFused) {
 				drainOutput();
 			}
@@ -605,7 +608,7 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements Fuseable, SourceP
 			this.prefetch = prefetch;
 			this.limit = Operators.unboundedOrLimit(prefetch);
 		}
-		
+
 		@Override
 		public Context currentContext() {
 			return parent.actual.currentContext();
