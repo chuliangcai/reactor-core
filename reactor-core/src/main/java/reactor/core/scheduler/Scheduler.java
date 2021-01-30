@@ -34,6 +34,7 @@ import reactor.core.Exceptions;
  * @author Stephane Maldini
  * @author Simon Baslé
  */
+// TODO: 2021/1/30 对jdk的schedule线程池的封装
 public interface Scheduler extends Disposable {
 
 	/**
@@ -48,6 +49,7 @@ public interface Scheduler extends Disposable {
 	 * @return the {@link Disposable} instance that let's one cancel this particular task.
 	 * If the {@link Scheduler} has been shut down, throw a {@link RejectedExecutionException}.
 	 */
+	// TODO: 2021/1/30 执行非延迟任务 
 	Disposable schedule(Runnable task);
 
 	/**
@@ -63,6 +65,7 @@ public interface Scheduler extends Disposable {
 	 * @return the {@link Disposable} that let's one cancel this particular delayed task,
 	 * or throw a {@link RejectedExecutionException} if the Scheduler is not capable of scheduling with delay.
 	 */
+	// TODO: 2021/1/30 执行一个延迟任务
 	default Disposable schedule(Runnable task, long delay, TimeUnit unit) {
 		throw Exceptions.failWithRejectedNotTimeCapable();
 	}
@@ -85,6 +88,7 @@ public interface Scheduler extends Disposable {
 	 * @return the {@link Disposable} that let's one cancel this particular delayed task,
 	 * or throw a {@link RejectedExecutionException} if the Scheduler is not capable of scheduling periodically.
 	 */
+	// TODO: 2021/1/30 执行周期任务
 	default Disposable schedulePeriodically(Runnable task, long initialDelay, long period, TimeUnit unit) {
 		throw Exceptions.failWithRejectedNotTimeCapable();
 	}

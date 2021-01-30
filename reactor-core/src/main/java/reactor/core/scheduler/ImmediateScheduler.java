@@ -48,6 +48,7 @@ final class ImmediateScheduler implements Scheduler, Scannable {
     
     @Override
     public Disposable schedule(Runnable task) {
+        // TODO: 2021/1/30 并没有用到线程池，而是在当前线程执行
         task.run();
         return FINISHED;
     }

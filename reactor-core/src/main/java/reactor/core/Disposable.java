@@ -25,6 +25,7 @@ import reactor.util.annotation.Nullable;
  * Indicates that a task or resource can be cancelled/disposed.
  * <p>Call to the dispose method is/should be idempotent.
  */
+// TODO: 2021/1/30 表示一个任务或者资源是可以终止的。
 @FunctionalInterface
 public interface Disposable {
 

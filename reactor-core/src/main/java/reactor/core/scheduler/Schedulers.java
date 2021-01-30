@@ -224,6 +224,7 @@ public abstract class Schedulers {
 	 * that reuses threads and evict idle ones
 	 */
 	public static Scheduler boundedElastic() {
+		// TODO: 2021/1/30 单例的
 		return cache(CACHED_BOUNDED_ELASTIC, BOUNDED_ELASTIC, BOUNDED_ELASTIC_SUPPLIER);
 	}
 
@@ -450,6 +451,7 @@ public abstract class Schedulers {
 	 * the number of backing threads and after that on the number of enqueued tasks,
 	 * that reuses threads and evict idle ones
 	 */
+
 	public static Scheduler newBoundedElastic(int threadCap, int queuedTaskCap, String name, int ttlSeconds, boolean daemon) {
 		return newBoundedElastic(threadCap, queuedTaskCap,
 				new ReactorThreadFactory(name, ElasticScheduler.COUNTER, daemon, false,
@@ -590,6 +592,7 @@ public abstract class Schedulers {
 	 * @return a new {@link Scheduler} that hosts a single-threaded ExecutorService-based
 	 * worker
 	 */
+	// TODO: 2021/1/30 创建一个单线程的线程池
 	public static Scheduler newSingle(String name, boolean daemon) {
 		return newSingle(new ReactorThreadFactory(name, SingleScheduler.COUNTER, daemon,
 				true, Schedulers::defaultUncaughtException));
@@ -934,6 +937,7 @@ public abstract class Schedulers {
 	 * @return decorated {@link Runnable} if any hook is registered, the original otherwise.
 	 */
 	public static Runnable onSchedule(Runnable runnable) {
+		// TODO: 2021/1/30 用来包装task
 		Function<Runnable, Runnable> hook = onScheduleHook;
 		if (hook != null) {
 			return hook.apply(runnable);
@@ -965,6 +969,7 @@ public abstract class Schedulers {
 	 * @return default instance of a {@link Scheduler} that hosts a single-threaded
 	 * ExecutorService-based worker
 	 */
+	// TODO: 2021/1/30 单例的
 	public static Scheduler single() {
 		return cache(CACHED_SINGLE, SINGLE, SINGLE_SUPPLIER);
 	}
@@ -1127,6 +1132,9 @@ public abstract class Schedulers {
 	static final Supplier<Scheduler> ELASTIC_SUPPLIER =
 			() -> newElastic(ELASTIC, ElasticScheduler.DEFAULT_TTL_SECONDS, true);
 
+	// TODO: 2021/1/30 有边界的弹性线程池
+	// TODO: 2021/1/30 DEFAULT_BOUNDED_ELASTIC_SIZE 默认是处理器个数的10倍
+	// TODO: 2021/1/30 DEFAULT_BOUNDED_ELASTIC_QUEUESIZE 默认队列大小是 100000
 	static final Supplier<Scheduler> BOUNDED_ELASTIC_SUPPLIER =
 			() -> newBoundedElastic(DEFAULT_BOUNDED_ELASTIC_SIZE, DEFAULT_BOUNDED_ELASTIC_QUEUESIZE,
 					BOUNDED_ELASTIC, BoundedElasticScheduler.DEFAULT_TTL_SECONDS, true);
@@ -1163,6 +1171,7 @@ public abstract class Schedulers {
 	static CachedScheduler cache(AtomicReference<CachedScheduler> reference, String key, Supplier<Scheduler> supplier) {
 		CachedScheduler s = reference.get();
 		if (s != null) {
+			// TODO: 2021/1/30 如果缓存里有直接取缓存的
 			return s;
 		}
 		s = new CachedScheduler(key, supplier.get());
@@ -1198,6 +1207,7 @@ public abstract class Schedulers {
 		}
 	}
 
+	// TODO: 2021/1/30 带标识的scheduler
 	static class CachedScheduler implements Scheduler, Supplier<Scheduler>, Scannable {
 
 		final Scheduler cached;

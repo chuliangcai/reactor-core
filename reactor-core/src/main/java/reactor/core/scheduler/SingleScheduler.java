@@ -33,6 +33,7 @@ import reactor.core.Scannable;
  * same-thread work (like an event dispatch thread). This scheduler is time-capable (can
  * schedule with delay / periodically).
  */
+// TODO: 2021/1/30 单线程的
 final class SingleScheduler implements Scheduler, Supplier<ScheduledExecutorService>,
                                        Scannable {
 
@@ -40,6 +41,7 @@ final class SingleScheduler implements Scheduler, Supplier<ScheduledExecutorServ
 
 	final ThreadFactory factory;
 
+	// TODO: 2021/1/30 jdk的线程池
 	volatile ScheduledExecutorService executor;
 	static final AtomicReferenceFieldUpdater<SingleScheduler, ScheduledExecutorService> EXECUTORS =
 			AtomicReferenceFieldUpdater.newUpdater(SingleScheduler.class,
@@ -99,6 +101,7 @@ final class SingleScheduler implements Scheduler, Supplier<ScheduledExecutorServ
 
 	@Override
 	public void dispose() {
+		// TODO: 2021/1/30 销毁线程池
 		ScheduledExecutorService a = executor;
 		if (a != TERMINATED) {
 			a = EXECUTORS.getAndSet(this, TERMINATED);
