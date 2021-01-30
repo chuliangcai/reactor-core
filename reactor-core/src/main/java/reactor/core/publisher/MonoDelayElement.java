@@ -37,6 +37,7 @@ import reactor.util.annotation.Nullable;
  */
 final class MonoDelayElement<T> extends InternalMonoOperator<T, T> {
 
+	// TODO: 2021/1/30 用于延迟的线程池
 	final Scheduler timedScheduler;
 
 	final long delay;
@@ -122,6 +123,8 @@ final class MonoDelayElement<T> extends InternalMonoOperator<T, T> {
 			}
 			this.done = true;
 			try {
+				// TODO: 2021/1/30 核心就是往线程池里面丢了一个定时任务
+				// TODO: 2021/1/30 到时间了就执行真正的onNext方法
 				this.task = scheduler.schedule(() -> complete(t), delay, unit);
 			}
 			catch (RejectedExecutionException ree) {

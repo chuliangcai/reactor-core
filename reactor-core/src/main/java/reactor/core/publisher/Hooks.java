@@ -608,6 +608,7 @@ public abstract class Hooks {
 	 */
 	static final String KEY_ON_REJECTED_EXECUTION = "reactor.onRejectedExecution.local";
 
+	// TODO: 2021/1/30 默认是false
 	static boolean GLOBAL_TRACE = initStaticGlobalTrace();
 
 

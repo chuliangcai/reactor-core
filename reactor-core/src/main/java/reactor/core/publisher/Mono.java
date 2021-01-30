@@ -2074,6 +2074,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * @return a delayed {@link Mono}
 	 */
 	public final Mono<T> delayElement(Duration delay) {
+		// TODO: 2021/1/30 parallel是一个个数和cpu核数一样大的单例线程池
 		return delayElement(delay, Schedulers.parallel());
 	}
 
@@ -4780,6 +4781,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * @return the source, potentially wrapped with assembly time cross-cutting behavior
 	 */
 	@SuppressWarnings("unchecked")
+	// TODO: 2021/1/30 将一个mono装配成另一个mono
 	protected static <T> Mono<T> onAssembly(Mono<T> source) {
 		Function<Publisher, Publisher> hook = Hooks.onEachOperatorHook;
 		if(hook != null) {

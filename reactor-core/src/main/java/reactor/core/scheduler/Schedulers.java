@@ -192,6 +192,7 @@ public abstract class Schedulers {
 	 * down
 	 * @deprecated use {@link #boundedElastic()}, to be removed in 3.5.0
 	 */
+	// TODO: 2021/1/30 不推荐使用了
 	@Deprecated
 	public static Scheduler elastic() {
 		return cache(CACHED_ELASTIC, ELASTIC, ELASTIC_SUPPLIER);
@@ -236,6 +237,7 @@ public abstract class Schedulers {
 	 * ExecutorService-based workers and is suited for parallel work
 	 */
 	public static Scheduler parallel() {
+		// TODO: 2021/1/30 单例的
 		return cache(CACHED_PARALLEL, PARALLEL, PARALLEL_SUPPLIER);
 	}
 
@@ -1135,13 +1137,17 @@ public abstract class Schedulers {
 	// TODO: 2021/1/30 有边界的弹性线程池
 	// TODO: 2021/1/30 DEFAULT_BOUNDED_ELASTIC_SIZE 默认是处理器个数的10倍
 	// TODO: 2021/1/30 DEFAULT_BOUNDED_ELASTIC_QUEUESIZE 默认队列大小是 100000
+	// TODO: 2021/1/30 注意是线程是demo线程
 	static final Supplier<Scheduler> BOUNDED_ELASTIC_SUPPLIER =
 			() -> newBoundedElastic(DEFAULT_BOUNDED_ELASTIC_SIZE, DEFAULT_BOUNDED_ELASTIC_QUEUESIZE,
 					BOUNDED_ELASTIC, BoundedElasticScheduler.DEFAULT_TTL_SECONDS, true);
 
+	// TODO: 2021/1/30 DEFAULT_POOL_SIZE 默认线程个数就是处理器的核数
+	// TODO: 2021/1/30 注意是线程是demo线程
 	static final Supplier<Scheduler> PARALLEL_SUPPLIER =
 			() -> newParallel(PARALLEL, DEFAULT_POOL_SIZE, true);
 
+	// TODO: 2021/1/30 注意是线程是demo线程
 	static final Supplier<Scheduler> SINGLE_SUPPLIER = () -> newSingle(SINGLE, true);
 
 	static final Factory DEFAULT = new Factory() { };
