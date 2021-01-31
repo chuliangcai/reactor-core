@@ -105,11 +105,13 @@ final class MonoDelayElement<T> extends InternalMonoOperator<T, T> {
 			}
 		}
 
+		// TODO: 2021/1/31
 		@Override
 		public void onSubscribe(Subscription s) {
 			if (Operators.validate(this.s, s)) {
 				this.s = s;
 
+				// TODO: 2021/1/31 订阅通知
 				actual.onSubscribe(this);
 				s.request(Long.MAX_VALUE);
 			}

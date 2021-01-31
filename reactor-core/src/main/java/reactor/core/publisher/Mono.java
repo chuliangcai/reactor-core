@@ -3896,6 +3896,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 *
 	 * @return a new {@link Disposable} that can be used to cancel the underlying {@link Subscription}
 	 */
+	// TODO: 2021/1/31 入口
 	public final Disposable subscribe(Consumer<? super T> consumer) {
 		Objects.requireNonNull(consumer, "consumer");
 		return subscribe(consumer, null, null);
@@ -4044,6 +4045,8 @@ public abstract class Mono<T> implements CorePublisher<T> {
 				}
 			}
 
+			// TODO: 2021/1/31 将订阅者订阅到发布者上
+			// TODO: 2021/1/31 publisher实际是个MonoJust
 			publisher.subscribe(subscriber);
 		}
 		catch (Throwable e) {

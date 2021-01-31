@@ -51,6 +51,7 @@ extends Mono<T>
 
 	@Override
 	public void subscribe(CoreSubscriber<? super T> actual) {
+		// TODO: 2021/1/31 Operators.scalarSubscription(actual, value) 生成Subscription
 		actual.onSubscribe(Operators.scalarSubscription(actual, value));
 	}
 
